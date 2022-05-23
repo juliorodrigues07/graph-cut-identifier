@@ -4,7 +4,7 @@
  
 # Compilação
 
-       gcc graph_cut.c -o main
+       make
 
 # Execução para instâncias de exemplo
 
