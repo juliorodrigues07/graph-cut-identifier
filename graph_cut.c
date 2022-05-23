@@ -1,46 +1,4 @@
-#include "graph.h"
-#include "read.h"
-
-// ----------------------------------------------------  MAIN  ---------------------------------------------------------
-
-int main(int argc, char **argv) {
-
-    // Entrada na linha de comando via terminal
-    int v = atoi(argv[1]);
-    int n = atoi(argv[2]);
-    const char *arestas = argv[3];
-    const char *cutting = argv[4];
-
-    if (v <= 0) {
-        printf("Número de vértices inválido! \n");
-        exit(1);
-    }
-
-    // Alocação e inicialização do grafo e cortes
-    Grafo *grafo = cria_grafo(v);
-    Corte *cortes = aloca_cortes(n);
-
-    // Leitura e criação das arestas do grafo a partir do arquivo de entrada
-    read_edges_file(grafo, arestas);
-
-    // Alocação e inicialização da matriz de distâncias mínimas
-    int **D = (int **) malloc(v * sizeof(int *));
-    for (int i = 0; i < v; i++)
-        D[i] = (int *) malloc(v * sizeof(int));
-    inicializa_matriz(grafo, D);
-
-    // Leitura e realização dos cortes no grafo a partir do arquivo de entrada
-    read_cutting_file(grafo, cortes, D, cutting);
-
-    // Checagem da existência ou não de caminho entre s e t
-    bool cut = fluxo_floyd_warshall(grafo, D);
-
-    // Exibição dos resultados obtidos após aplicação do corte e cálculo de caminhos no grafo
-    analisa_corte(cortes, n, cut);
-
-    free_graph(grafo);
-    return 0;
-}
+#include "utilities.h"
 
 // ----------------------------------------------  FUNÇÕES PRINCIPAIS  -------------------------------------------------
 
@@ -129,4 +87,129 @@ void cria_corte(Grafo *g, Corte *c, int origem, int destino, int pos, int **D) {
     */
     c[pos].capacidade = D[origem][destino];
     D[origem][destino] = INF;
+}
+
+// -----------------------------------------  LEITURA DOS DADOS DO GRAFO  -------------------------------------------
+
+void read_edges_file(Grafo *g, const char *file_name) {
+
+    FILE *arquivo;
+    arquivo = fopen(file_name, "r");
+
+    if (!arquivo) {
+        printf("O arquivo %s não pode ser aberto! \n", file_name);
+        exit(1);
+    }
+
+    int aresta[3];
+    int valor, i = 0;
+
+    while (!feof(arquivo)) {
+
+        if (!fscanf(arquivo, "%d\n", &valor)) {
+            printf("Falha na leitura! \n");
+            exit(1);
+        }
+
+        aresta[i] = valor;
+        i++;
+
+        if (i == 3) {
+            i = 0;
+            cria_aresta(g, aresta[0], aresta[1], aresta[2]);
+        }
+    }
+
+    fclose(arquivo);
+}
+
+void read_cutting_file(Grafo *g, Corte *c, int **D, const char *file_name) {
+
+    FILE *arquivo;
+    arquivo = fopen(file_name, "r");
+
+    if (!arquivo) {
+        printf("O arquivo %s não pode ser aberto! \n", file_name);
+        exit(1);
+    }
+
+    int corte[2];
+    int valor, i = 0;
+    int pos = 0;        // Índice do vetor da estrutura de dados dos cortes
+
+    while (!feof(arquivo)) {
+
+        if (!fscanf(arquivo, "%d\n", &valor)) {
+            printf("Falha na leitura! \n");
+            exit(1);
+        }
+
+        corte[i] = valor;
+        i++;
+
+        if (i == 2) {
+            i = 0;
+            cria_corte(g, c, corte[0], corte[1], pos, D);
+            pos++;
+        }
+    }
+
+    fclose(arquivo);
+}
+
+// -----------------------------------  CRIAÇÃO E MANIPULAÇÃO DO GRAFO E ARESTAS  --------------------------------------
+
+Grafo *cria_grafo(int v) {
+
+    Grafo *g = (Grafo *) malloc(sizeof(Grafo));
+    g->v = v;
+
+    g->matriz_adj = (int **) malloc(v * sizeof(int *));
+    for(int i = 0; i < v; i++)
+        g->matriz_adj[i] = (int *) malloc(v * sizeof(int));
+
+    for (int i = 0 ; i < v; i++) {
+        for (int j = 0; j < v; j++)
+            g->matriz_adj[i][j] = 0;
+    }
+
+    return g;
+}
+
+void cria_aresta(Grafo *g, int origem, int destino, int capacidade) {
+
+    if ((origem <= 0 || origem > g->v) || (destino <= 0 || destino > g->v)) {
+        printf("Aresta inválida encontrada: %d ---> %d \n", origem, destino);
+        exit(1);
+    }
+
+    // Correção para os índices da matriz
+    origem--;
+    destino--;
+
+    g->matriz_adj[origem][destino] = capacidade;      // Grafo direcionado
+}
+
+void free_graph(Grafo *g) {
+
+    for (int i = 0; i < g->v; i++)
+        free(g->matriz_adj[i]);
+
+    free(g->matriz_adj);
+    free(g);
+}
+
+// ---------------------------------  INCIALIZAÇÃO DA MATRIZ DE DISTÂNCIAS MÍNIMAS  ------------------------------------
+
+void inicializa_matriz(Grafo *g, int **D) {
+
+    for (int i = 0; i < g->v; i++) {
+        for (int j = 0; j < g->v; j++) {
+
+            if (i != j && g->matriz_adj[i][j] == 0)
+                D[i][j] = INF;
+            else
+                D[i][j] = g->matriz_adj[i][j];
+        }
+    }
 }
