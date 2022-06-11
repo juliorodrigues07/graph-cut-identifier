@@ -12,18 +12,18 @@
 
 Grafo 1:
 
-       ./main 6 2 ../graph1/grafo_1.txt ../graph1/corte_1.txt
+       ./main 6 2 ../Instances/graph1/grafo_1.txt ../Instances/graph1/corte_1.txt
        
-       ./main 6 2 ../graph1/grafo_1.txt ../graph1/corte_2.txt
+       ./main 6 2 ../Instances/graph1/grafo_1.txt ../Instances/graph1/corte_2.txt
       
-       ./main 6 2 ../graph1/grafo_1.txt ../graph1/corte_3.txt
+       ./main 6 2 ../Instances/graph1/grafo_1.txt ../Instances/graph1/corte_3.txt
        
-       ./main 6 2 ../graph1/grafo_1.txt ../graph1/corte_4.txt
+       ./main 6 2 ../Instances/graph1/grafo_1.txt ../Instances/graph1/corte_4.txt
        
 Grafo 2:
 
-       ./main 7 3 ../graph2/grafo_2.txt ../graph2/corte_1.txt
+       ./main 7 3 ../Instances/graph2/grafo_2.txt ../Instances/graph2/corte_1.txt
        
-       ./main 7 3 ../graph2/grafo_2.txt ../graph2/corte_2.txt
+       ./main 7 3 ../Instances/graph2/grafo_2.txt ../Instances/graph2/corte_2.txt
        
-       ./main 7 5 ../graph2/grafo_2.txt ../graph2/corte_3.txt
+       ./main 7 5 ../Instances/graph2/grafo_2.txt ../Instances/graph2/corte_3.txt
